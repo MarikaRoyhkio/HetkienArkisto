@@ -1,76 +1,42 @@
 import React, { useState } from 'react';
 import AddEntryForm from './AddEntryForm';
-import AddThemeForm from './AddThemeForm';
+//import AddThemeForm from './AddThemeForm';
 
 // Tyypit
 type Entry = {
     date: string;
     content: string;
     image?: string;
+    themes: string[];
+    moods?: string[];
 };
 
 type Theme = {
     name: string;
     color: string;
-    entries: Entry[];
 };
 
 type ThemeViewProps = {
     themes: Theme[];
-    setThemes: React.Dispatch<React.SetStateAction<Theme[]>>;
+    entries: Entry[];
+    onAddEntry: (entry: Entry) => void;
 };
 
-const ThemeView: React.FC<ThemeViewProps> = ({ themes, setThemes }) => {
-    const [activeTheme, setActiveTheme] = useState<string | null>(null);
-    const [showAddThemeForm, setShowAddThemeForm] = useState(false);
-
-    const handleAddEntry = (themeName: string, newEntry: Entry) => {
-        setThemes((prevThemes) =>
-            prevThemes.map((theme) =>
-                theme.name === themeName
-                    ? {
-                        ...theme,
-                        entries: [...theme.entries, newEntry].sort(
-                            (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-                        ),
-                    }
-                    : theme
-            )
-        );
-    };
-
-
-    const addTheme = (name: string, color: string) => {
-        setThemes([...themes, { name, color, entries: [] }]);
-        setShowAddThemeForm(false); // Sulje lomake
-    };
+const ThemeView: React.FC<ThemeViewProps> = ({ themes, entries, onAddEntry }) => {
+    const [selectedDay, setSelectedDay] = useState<string | null>(null);
 
     return (
         <div>
-            <h2>Teemat</h2>
-            <ul>
-                {themes.map((theme) => (
-                    <li key={theme.name} style={{ backgroundColor: theme.color }}>
-                        <strong>{theme.name}</strong>
-                        <button onClick={() => setActiveTheme(theme.name)}>Lisää merkintä</button>
-                    </li>
-                ))}
-            </ul>
-            <button onClick={() => setShowAddThemeForm(true)}>Lisää teema</button>
-            {showAddThemeForm && (
-                <AddThemeForm onAddTheme={addTheme} onClose={() => setShowAddThemeForm(false)} />
-            )}
-
-            {activeTheme && (
+            {selectedDay && (
                 <AddEntryForm
-                    themeName={activeTheme}
-                    onSave={(entry) => handleAddEntry(activeTheme, entry)}
-                    onClose={() => setActiveTheme(null)}
+                    date={selectedDay} // Varmistetaan, että päivämäärä välitetään
+                    themes={themes} // Teemat, joita voidaan valita
+                    onSave={onAddEntry} // Tallenna merkintä
+                    onClose={() => setSelectedDay(null)} // Sulje lomake
                 />
             )}
         </div>
     );
-
 };
 
 export default ThemeView;

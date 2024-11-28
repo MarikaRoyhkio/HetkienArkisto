@@ -1,3 +1,4 @@
+/* Lomakkeen tausta ja asettelu */
 .form {
     position: fixed;
     top: 0;
@@ -5,6 +6,7 @@
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.5);
+    /* Hämärretty tausta */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -17,6 +19,8 @@
     width: 90%;
     max-width: 400px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    overflow-y: auto;
+    /* Varmistaa, että sisältö ei mene ulos */
 }
 
 .form-content h2 {
@@ -32,6 +36,7 @@
     margin-top: 10px;
 }
 
+/* Syöttökentät */
 .form-content input,
 .form-content textarea {
     width: 100%;
@@ -40,8 +45,10 @@
     border: 1px solid #cc3363;
     border-radius: 4px;
     box-sizing: border-box;
+    font-size: 14px;
 }
 
+/* Kuvan esikatselu */
 .form-content img {
     display: block;
     max-width: 100px;
@@ -49,6 +56,7 @@
     border-radius: 5px;
 }
 
+/* Lomakkeen napit */
 .form-content button {
     background-color: #3d3b8e;
     color: white;
@@ -57,6 +65,7 @@
     border-radius: 5px;
     margin: 5px;
     cursor: pointer;
+    font-size: 16px;
 }
 
 .form-content button:hover {
@@ -71,6 +80,7 @@
     background-color: #cc3363;
 }
 
+/* Body ja yleiset tyylit */
 body {
     font-family: 'Times New Roman', serif;
     background-color: #3d3b8e;
@@ -86,8 +96,11 @@ header {
     font-size: 24px;
     color: #3d3b8e;
     border-bottom: 4px solid #cc3363;
+    margin-bottom: 20px;
+    /* Lisää tilaa */
 }
 
+/* Yleiset napit */
 button {
     background-color: #cc3363;
     border: none;
@@ -96,12 +109,14 @@ button {
     font-size: 16px;
     cursor: pointer;
     margin: 5px;
+    border-radius: 5px;
 }
 
 button:hover {
     background-color: #a30b37;
 }
 
+/* Kortit, jotka voivat sisältää tietoa */
 .card {
     background-color: #f7ece1;
     color: #3d3b8e;
@@ -109,4 +124,83 @@ button:hover {
     padding: 20px;
     margin: 10px;
     box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Kalenterin asettelu */
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    margin: 10px 0;
+}
+
+/* Päiväruutujen ulkoasu */
+.calendar-day {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+    position: relative;
+    transition: background-color 0.3s ease;
+}
+
+/* Hover-efekti päiväruudulle */
+.calendar-day:hover {
+    background-color: #f0f0f0;
+    cursor: pointer;
+}
+
+.day-entries {
+    margin-top: 5px;
+}
+
+/* Teeman väripisteet päivillä */
+.entry-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    margin: 0 2px;
+}
+
+/* Asetukset nappeihin, jotka voivat olla lomakkeessa */
+input[type="checkbox"] {
+    margin-right: 5px;
+}
+
+/* Teemojen väritykset */
+.entry-dot {
+    background-color: #f0f0f0;
+}
+
+.entry-dot:hover {
+    opacity: 0.8;
+}
+
+/* Lomakkeen sulkemisnappi */
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #cc3363;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.close-button:hover {
+    background-color: #a30b37;
+}
+
+/* Varmistetaan, että selainikkuna on responsiivinen */
+@media (max-width: 768px) {
+    .calendar-grid {
+        grid-template-columns: repeat(4, 1fr);
+        /* Vähennetään sarakkeiden määrää pienemmillä ruuduilla */
+    }
+
+    .form-content {
+        max-width: 90%;
+    }
 }

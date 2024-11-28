@@ -4,27 +4,39 @@ type Entry = {
     date: string;
     content: string;
     image?: string;
+    themes: string[],
+    moods?: string[];
 };
 
 type AddEntryFormProps = {
-    themeName: string;
+    date: string;
+    themes: { name: string; color: string }[];
     onSave: (entry: Entry) => void;
     onClose: () => void;
 };
 
-const AddEntryForm: React.FC<AddEntryFormProps> = ({ themeName, onSave, onClose }) => {
-    const [date, setDate] = useState('');
+const AddEntryForm: React.FC<AddEntryFormProps> = ({ date, themes, onSave, onClose }) => {
+    const [selectedThemes, setSelectedThemes] = useState<string[]>([]);
     const [content, setContent] = useState('');
     const [image, setImage] = useState<string | undefined>();
+    const [selectedMoods, setSelectedMoods] = useState<string[]>([]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!date || !content) {
-            alert('Päivämäärä ja sisältö ovat pakollisia!');
+        if (!content || !selectedThemes.length) {
+            alert('Sisältö ja teemat ovat pakollisia!');
             return;
         }
 
-        onSave({ date, content, image });
+        const newEntry: Entry = {
+            date,
+            content,
+            image,
+            themes: selectedThemes,
+            moods: selectedMoods,
+        };
+
+        onSave(newEntry);
         onClose();
     };
 
@@ -38,32 +50,57 @@ const AddEntryForm: React.FC<AddEntryFormProps> = ({ themeName, onSave, onClose 
         }
     };
 
+    const handleThemeChange = (themeName: string) => {
+        setSelectedThemes((prevThemes) =>
+            prevThemes.includes(themeName)
+                ? prevThemes.filter((theme) => theme !== themeName)
+                : [...prevThemes, themeName]
+        );
+    };
+
+    const handleMoodChange = (mood: string) => {
+        setSelectedMoods((prevMoods) =>
+            prevMoods.includes(mood) ? prevMoods.filter((m) => m !== mood) : [...prevMoods, mood]
+        );
+    };
+
     return (
         <div className="form">
-            <div className="form-content">
-                <h2>Lisää merkintä teemaan: {themeName}</h2>
-                <form onSubmit={handleSubmit}>
-                    <div>
-                        <label>Päivämäärä:</label>
-                        <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
-                    </div>
-                    <div>
-                        <label>Merkinnän sisältö:</label>
-                        <textarea value={content} onChange={(e) => setContent(e.target.value)} />
-                    </div>
-                    <div>
-                        <label>Lisää kuva:</label>
-                        <input type="file" accept="image/*" onChange={handleImageUpload} />
-                    </div>
-                    {image && <img src={image} alt="Esikatselu" style={{ maxWidth: '100px', marginTop: '10px' }} />}
-                    <div>
-                        <button type="submit">Tallenna</button>
-                        <button type="button" onClick={onClose}>
-                            Peruuta
-                        </button>
-                    </div>
-                </form>
-            </div>
+            <h2>Lisää merkintä päivälle: {date}</h2>
+            <form onSubmit={handleSubmit}>
+                <div>
+                    <label>Päivämäärä:</label>
+                    <input type="date" value={date} readOnly />
+                </div>
+                <div>
+                    <label>Merkinnän sisältö:</label>
+                    <textarea value={content} onChange={(e) => setContent(e.target.value)} required />
+                </div>
+                <div>
+                    <label>Valitse teemat:</label>
+                    {themes.map((theme) => (
+                        <label key={theme.name} style={{ backgroundColor: theme.color }}>
+                            <input
+                                type="checkbox"
+                                checked={selectedThemes.includes(theme.name)}
+                                onChange={() => handleThemeChange(theme.name)}
+                            />
+                            {theme.name}
+                        </label>
+                    ))}
+                </div>
+                <div>
+                    <label>Valitse fiilikset:</label>
+                    {/* Lisätään fiiliksen valinta tähän */}
+                </div>
+                <div>
+                    <label>Lisää kuva:</label>
+                    <input type="file" accept="image/*" onChange={handleImageUpload} />
+                </div>
+                {image && <img src={image} alt="Esikatselu" style={{ maxWidth: '100px', marginTop: '10px' }} />}
+                <button type="submit">Tallenna merkintä</button>
+                <button type="button" onClick={onClose}>Peruuta</button>
+            </form>
         </div>
     );
 };
