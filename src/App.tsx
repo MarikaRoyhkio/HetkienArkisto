@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import ThemeView from './components/ThemeView';
 import Timeline from './components/Timeline';
-
+import './styles/global.css';
 
 type Entry = {
   date: string;
@@ -10,14 +10,15 @@ type Entry = {
 
 type Theme = {
   name: string;
+  color: string;
   entries: Entry[];
 };
 
 const App = () => {
 
   const [themes, setThemes] = useState<Theme[]>([
-    { name: 'Opiskelu', entries: [] },
-    { name: 'Vapaa-aika', entries: [] },
+    { name: 'Opiskelu', color: '#ff6347', entries: [] },
+    { name: 'Vapaa-aika', color: '#4caf50', entries: [] },
   ]);
 
   return (
