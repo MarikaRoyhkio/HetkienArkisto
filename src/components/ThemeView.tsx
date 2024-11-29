@@ -8,7 +8,7 @@ type Entry = {
     content: string;
     image?: string;
     themes: string[];
-    moods?: string[];
+    moods: string[];
 };
 
 type Theme = {
@@ -25,12 +25,15 @@ type ThemeViewProps = {
 const ThemeView: React.FC<ThemeViewProps> = ({ themes, entries, onAddEntry }) => {
     const [selectedDay, setSelectedDay] = useState<string | null>(null);
 
+    const filteredEntries = entries.filter((entry) => entry.date === selectedDay);
+
     return (
         <div>
             {selectedDay && (
                 <AddEntryForm
                     date={selectedDay} // Varmistetaan, että päivämäärä välitetään
                     themes={themes} // Teemat, joita voidaan valita
+                    entries={filteredEntries}
                     onSave={onAddEntry} // Tallenna merkintä
                     onClose={() => setSelectedDay(null)} // Sulje lomake
                 />

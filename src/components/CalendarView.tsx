@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import AddEntryForm from './AddEntryForm';
+import MoodThemeGraph from './MoodThemeGraph';
 import '../styles/global.css';
 
 type Entry = {
@@ -32,10 +33,12 @@ const moodIcons: Record<string, string> = {
     Rakastunut: '❤️',
 };
 
+const weekDays = ['Maanantai', 'Tiistai', 'Keskiviikko', 'Torstai', 'Perjantai', 'Lauantai', 'Sunnuntai'];
+
 const CalendarView: React.FC<CalendarViewProps> = ({ themes, entries, onAddEntry }) => {
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDay, setSelectedDay] = useState<string | null>(null);
-    const [showEntries, setShowEntries] = useState<Entry[]>([]);
+    const [isAddEntryFormVisible, setIsAddEntryFormVisible] = useState(false);
 
     const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
     const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
@@ -46,9 +49,8 @@ const CalendarView: React.FC<CalendarViewProps> = ({ themes, entries, onAddEntry
     );
 
     const handleDayClick = (date: string) => {
-        const dayEntries = entries.filter((entry) => entry.date === date);
-        setShowEntries(dayEntries);
         setSelectedDay(date);
+        setIsAddEntryFormVisible(false);
     };
 
     const previousMonth = () => {
@@ -59,6 +61,12 @@ const CalendarView: React.FC<CalendarViewProps> = ({ themes, entries, onAddEntry
         setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
     };
 
+    const firstDayIndex = (startOfMonth.getDay() + 6) % 7;
+
+    const filteredEntries = selectedDay
+        ? entries.filter((entry) => entry.date === selectedDay)
+        : [];
+
     return (
         <div>
             <div className="calendar-header">
@@ -68,7 +76,17 @@ const CalendarView: React.FC<CalendarViewProps> = ({ themes, entries, onAddEntry
                 </h2>
                 <button onClick={nextMonth}>Seuraava</button>
             </div>
+            <div className="weekdays">
+                {weekDays.map((day) => (
+                    <div key={day} className="weekday">
+                        {day}
+                    </div>
+                ))}
+            </div>
             <div className="calendar-grid">
+                {[...Array(firstDayIndex)].map((_, i) => (
+                    <div key={`empty-${i}`} className="calendar-day empty"></div>
+                ))}
                 {daysInMonth.map((day) => {
                     const dayString = day.toISOString().split('T')[0];
                     const dayEntries = entries.filter((entry) => entry.date === dayString);
@@ -81,7 +99,6 @@ const CalendarView: React.FC<CalendarViewProps> = ({ themes, entries, onAddEntry
                         >
                             <span>{day.getDate()}</span>
                             <div className="day-symbols">
-                                {/* Teemapallukat */}
                                 {dayEntries.flatMap((entry) =>
                                     entry.themes.map((theme) => {
                                         const themeColor = themes.find((t) => t.name === theme)?.color;
@@ -94,7 +111,6 @@ const CalendarView: React.FC<CalendarViewProps> = ({ themes, entries, onAddEntry
                                         ) : null;
                                     })
                                 )}
-                                {/* Fiilissymbolit */}
                                 {dayEntries.flatMap((entry) =>
                                     entry.moods.map((mood) => (
                                         <span key={`${mood}-${dayString}`} title={mood}>
@@ -103,57 +119,70 @@ const CalendarView: React.FC<CalendarViewProps> = ({ themes, entries, onAddEntry
                                     ))
                                 )}
                             </div>
-                            {/* Kuva (alapuolella) */}
-                            {dayEntries[0]?.image && (
-                                <div
-                                    className="day-image"
-                                    style={{
-                                        backgroundImage: `url(${dayEntries[0].image})`,
-                                        backgroundSize: 'cover',
-                                    }}
-                                ></div>
-                            )}
                         </div>
                     );
                 })}
             </div>
-            {/* Merkinnät ja lisääminen */}
-            {selectedDay && (
-                <div className="entry-modal">
+            {selectedDay && !isAddEntryFormVisible && (
+                <div className="modal-overlay">
                     <div className="modal-content">
-                        <h3>Merkinnät päivältä {selectedDay}</h3>
-                        {showEntries.length > 0 ? (
-                            <ul>
-                                {showEntries.map((entry, index) => (
-                                    <li key={index}>
+                        <h3>Merkinnät päivälle {selectedDay}</h3>
+                        {filteredEntries.length > 0 ? (
+                            <ul className="entry-list">
+                                {filteredEntries.map((entry, index) => (
+                                    <li key={index} className="entry-item">
+                                        <p>
+                                            {entry.themes.join(', ')} {entry.moods.map((mood) => moodIcons[mood]).join(' ')}
+                                        </p>
+
                                         <p>{entry.content}</p>
-                                        <div>
-                                            <strong>Teemat:</strong> {entry.themes.join(', ')}
-                                        </div>
-                                        <div>
-                                            <strong>Fiilikset:</strong> {entry.moods.map((mood) => moodIcons[mood]).join(' ')}
-                                        </div>
+                                        {entry.image && (
+                                            <div
+                                                className="entry-image"
+                                                style={{
+                                                    backgroundImage: `url(${entry.image})`,
+                                                    backgroundSize: 'contain',
+                                                    backgroundPosition: 'center',
+                                                    height: '150px',
+                                                    width: '150px',
+                                                    border: '1px solid #ccc',
+                                                    margin: '10px 0',
+                                                }}
+                                            ></div>
+                                        )}
                                     </li>
                                 ))}
                             </ul>
                         ) : (
-                            <p>Ei merkintöjä.</p>
+                            <p>Ei merkintöjä tältä päivältä.</p>
                         )}
-                        <button onClick={() => setSelectedDay(null)}>Sulje</button>
-                        <AddEntryForm
-                            date={selectedDay}
-                            themes={themes}
-                            onSave={(entry) => {
-                                onAddEntry(entry);
-                                setSelectedDay(null);
-                            }}
-                            onClose={() => setSelectedDay(null)}
-                        />
+                        <div className="modal-buttons">
+                            <button
+                                onClick={() => { setIsAddEntryFormVisible(true) }}
+                            >
+                                Lisää merkintä
+                            </button>
+                            <button onClick={() => setSelectedDay(null)}>Sulje</button>
+                        </div>
                     </div>
                 </div>
+            )}
+
+            {isAddEntryFormVisible && selectedDay && (
+                <AddEntryForm
+                    date={selectedDay}
+                    themes={themes}
+                    entries={filteredEntries}
+                    onSave={(entry) => {
+                        onAddEntry(entry);
+                        setIsAddEntryFormVisible(false); // Sulje lomake tallentamisen jälkeen
+                    }}
+                    onClose={() => setIsAddEntryFormVisible(false)}
+                />
             )}
         </div>
     );
 };
 
 export default CalendarView;
+

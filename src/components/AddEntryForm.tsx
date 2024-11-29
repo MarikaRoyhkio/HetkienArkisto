@@ -5,6 +5,7 @@ import '../styles/global.css';
 type AddEntryFormProps = {
     date: string;
     themes: { name: string; color: string }[];
+    entries: { content: string; image?: string; themes: string[]; moods: string[] }[];
     onSave: (entry: {
         date: string;
         content: string;
@@ -15,11 +16,12 @@ type AddEntryFormProps = {
     onClose: () => void;
 };
 
-const AddEntryForm: React.FC<AddEntryFormProps> = ({ date, themes, onSave, onClose }) => {
+const AddEntryForm: React.FC<AddEntryFormProps> = ({ date, themes, entries, onSave, onClose }) => {
     const [content, setContent] = useState('');
     const [selectedThemes, setSelectedThemes] = useState<string[]>([]);
     const [image, setImage] = useState<File | null>(null);
     const [moods, setMoods] = useState<string[]>([]);
+    const [showForm, setShowForm] = useState(false);
 
     const availableMoods = [
         { value: 'Iloinen', label: '😊' },
@@ -54,12 +56,46 @@ const AddEntryForm: React.FC<AddEntryFormProps> = ({ date, themes, onSave, onClo
             image: image ? URL.createObjectURL(image) : undefined,
         };
         onSave(entry);
+        setContent('');
+        setSelectedThemes([]);
+        setMoods([]);
+        setImage(null);
+        setShowForm(false);
     };
+
+
 
     return (
         <div className="form-overlay">
             <div className="form-content">
-                <h3>Lisää merkintä päivälle {date}</h3>
+                <h3>Merkinnät päivälle {date}</h3>
+                {entries.length > 0 ? (
+                    <div className="entry-list">
+                        {entries.map((entry, index) => (
+                            <div key={index} className="entry">
+                                <p>{entry.content}</p>
+                                {entry.image && <img src={entry.image} alt="Entry" className="entry-image" />}
+                                <div>
+                                    {entry.themes.map((theme) => (
+                                        <span
+                                            key={theme}
+                                            className="theme-chip"
+                                            style={{
+                                                backgroundColor: themes.find((t) => t.name === theme)
+                                                    ?.color,
+                                            }}
+                                        >
+                                            {theme}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <p>Ei merkintöjä tälle päivälle.</p>
+                )}
+
                 <form onSubmit={handleSubmit}>
                     <div>
                         <label htmlFor="content">Merkinnän sisältö:</label>
@@ -120,6 +156,7 @@ const AddEntryForm: React.FC<AddEntryFormProps> = ({ date, themes, onSave, onClo
                         Peruuta
                     </button>
                 </form>
+
             </div>
         </div>
     );

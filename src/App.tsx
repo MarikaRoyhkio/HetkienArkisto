@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import CalendarView from './components/CalendarView';
 import AddThemeForm from './components/AddThemeForm';
+import MoodThemeGraph from './components/MoodThemeGraph';
 import './styles/global.css';
 
 type Entry = {
@@ -59,6 +60,8 @@ const App = () => {
           entries={entries}
           onAddEntry={handleAddEntry}
         />
+        <MoodThemeGraph entries={entries} themes={themes} graphType="moods" />
+        <MoodThemeGraph entries={entries} themes={themes} graphType="themes" />
       </main>
       {isAddingTheme && (
         <AddThemeForm
