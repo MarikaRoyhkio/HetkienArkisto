@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import CalendarView from './components/CalendarView';
+import AddThemeForm from './components/AddThemeForm';
 import './styles/global.css';
 
 type Entry = {
@@ -7,7 +8,7 @@ type Entry = {
   content: string;
   image?: string;
   themes: string[];
-  moods?: string[];
+  moods: string[];
 };
 
 type Theme = {
@@ -16,27 +17,58 @@ type Theme = {
 };
 
 const App = () => {
-
   const [themes, setThemes] = useState<Theme[]>([
-    { name: 'Opiskelu', color: '#ff6347' },
-    { name: 'Vapaa-aika', color: '#4caf50' },
-    { name: 'Matkustelu', color: '#1e90ff' },
+    { name: 'Opiskelu', color: '#ffc0cb' },
+    { name: 'Vapaa-aika', color: '#add8e6' },
+    { name: 'Matkustelu', color: '#ffe4b5' },
   ]);
 
   const [entries, setEntries] = useState<Entry[]>([]);
+  const [isAddingTheme, setIsAddingTheme] = useState(false);
+
+  useEffect(() => {
+    // Simuloi tietojen noutoa localStoragesta
+    const savedEntries = localStorage.getItem('entries');
+    const savedThemes = localStorage.getItem('themes');
+    if (savedEntries) setEntries(JSON.parse(savedEntries));
+    if (savedThemes) setThemes(JSON.parse(savedThemes));
+  }, []);
+
+  useEffect(() => {
+    // Tallennetaan localStorageen
+    localStorage.setItem('entries', JSON.stringify(entries));
+    localStorage.setItem('themes', JSON.stringify(themes));
+  }, [entries, themes]);
 
   const handleAddEntry = (newEntry: Entry) => {
     setEntries([...entries, newEntry]);
+  };
+
+  const handleAddTheme = (name: string, color: string) => {
+    setThemes([...themes, { name, color }]);
+    setIsAddingTheme(false);
   };
 
   return (
     <div>
       <header>Hetkien Arkisto</header>
       <main>
-        <CalendarView themes={themes} entries={entries} onAddEntry={handleAddEntry} />
+        <button onClick={() => setIsAddingTheme(true)}>Lisää uusi teema</button>
+        <CalendarView
+          themes={themes}
+          entries={entries}
+          onAddEntry={handleAddEntry}
+        />
       </main>
+      {isAddingTheme && (
+        <AddThemeForm
+          onAddTheme={handleAddTheme}
+          onClose={() => setIsAddingTheme(false)}
+        />
+      )}
     </div>
   );
 };
 
 export default App;
+

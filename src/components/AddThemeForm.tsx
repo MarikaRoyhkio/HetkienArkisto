@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import '../styles/global.css';
 
 // Tyypit
 type AddThemeFormProps = {
@@ -12,6 +13,7 @@ const AddThemeForm: React.FC<AddThemeFormProps> = ({ onAddTheme, onClose }) => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        if (!name.trim()) return;
         onAddTheme(name, color); // Lähetetään tiedot App.tsx:lle
     };
 

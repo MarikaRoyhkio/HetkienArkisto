@@ -1,106 +1,126 @@
 import React, { useState } from 'react';
+import '../styles/global.css';
 
-type Entry = {
-    date: string;
-    content: string;
-    image?: string;
-    themes: string[],
-    moods?: string[];
-};
-
+// Tyypit
 type AddEntryFormProps = {
     date: string;
     themes: { name: string; color: string }[];
-    onSave: (entry: Entry) => void;
+    onSave: (entry: {
+        date: string;
+        content: string;
+        image?: string;
+        themes: string[];
+        moods: string[];
+    }) => void;
     onClose: () => void;
 };
 
 const AddEntryForm: React.FC<AddEntryFormProps> = ({ date, themes, onSave, onClose }) => {
-    const [selectedThemes, setSelectedThemes] = useState<string[]>([]);
     const [content, setContent] = useState('');
-    const [image, setImage] = useState<string | undefined>();
-    const [selectedMoods, setSelectedMoods] = useState<string[]>([]);
+    const [selectedThemes, setSelectedThemes] = useState<string[]>([]);
+    const [image, setImage] = useState<File | null>(null);
+    const [moods, setMoods] = useState<string[]>([]);
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!content || !selectedThemes.length) {
-            alert('Sisältö ja teemat ovat pakollisia!');
-            return;
-        }
+    const availableMoods = [
+        { value: 'Iloinen', label: '😊' },
+        { value: 'Neutraali', label: '😐' },
+        { value: 'Surullinen', label: '😢' },
+        { value: 'Väsynyt', label: '😴' },
+        { value: 'Innostunut', label: '🤩' },
+        { value: 'Pettynyt', label: '😞' },
+        { value: 'Vihainen', label: '😠' },
+        { value: 'Rakastunut', label: '❤️' },
+    ];
 
-        const newEntry: Entry = {
-            date,
-            content,
-            image,
-            themes: selectedThemes,
-            moods: selectedMoods,
-        };
-
-        onSave(newEntry);
-        onClose();
-    };
-
-    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            const reader = new FileReader();
-            reader.onload = () => {
-                setImage(reader.result as string);
-            };
-            reader.readAsDataURL(e.target.files[0]);
-        }
-    };
-
-    const handleThemeChange = (themeName: string) => {
-        setSelectedThemes((prevThemes) =>
-            prevThemes.includes(themeName)
-                ? prevThemes.filter((theme) => theme !== themeName)
-                : [...prevThemes, themeName]
+    const handleThemeChange = (theme: string) => {
+        setSelectedThemes((prev) =>
+            prev.includes(theme) ? prev.filter((t) => t !== theme) : [...prev, theme]
         );
     };
 
     const handleMoodChange = (mood: string) => {
-        setSelectedMoods((prevMoods) =>
-            prevMoods.includes(mood) ? prevMoods.filter((m) => m !== mood) : [...prevMoods, mood]
+        setMoods((prev) =>
+            prev.includes(mood) ? prev.filter((m) => m !== mood) : [...prev, mood]
         );
     };
 
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        const entry = {
+            date,
+            content,
+            themes: selectedThemes,
+            moods,
+            image: image ? URL.createObjectURL(image) : undefined,
+        };
+        onSave(entry);
+    };
+
     return (
-        <div className="form">
-            <h2>Lisää merkintä päivälle: {date}</h2>
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label>Päivämäärä:</label>
-                    <input type="date" value={date} readOnly />
-                </div>
-                <div>
-                    <label>Merkinnän sisältö:</label>
-                    <textarea value={content} onChange={(e) => setContent(e.target.value)} required />
-                </div>
-                <div>
-                    <label>Valitse teemat:</label>
-                    {themes.map((theme) => (
-                        <label key={theme.name} style={{ backgroundColor: theme.color }}>
-                            <input
-                                type="checkbox"
-                                checked={selectedThemes.includes(theme.name)}
-                                onChange={() => handleThemeChange(theme.name)}
-                            />
-                            {theme.name}
-                        </label>
-                    ))}
-                </div>
-                <div>
-                    <label>Valitse fiilikset:</label>
-                    {/* Lisätään fiiliksen valinta tähän */}
-                </div>
-                <div>
-                    <label>Lisää kuva:</label>
-                    <input type="file" accept="image/*" onChange={handleImageUpload} />
-                </div>
-                {image && <img src={image} alt="Esikatselu" style={{ maxWidth: '100px', marginTop: '10px' }} />}
-                <button type="submit">Tallenna merkintä</button>
-                <button type="button" onClick={onClose}>Peruuta</button>
-            </form>
+        <div className="form-overlay">
+            <div className="form-content">
+                <h3>Lisää merkintä päivälle {date}</h3>
+                <form onSubmit={handleSubmit}>
+                    <div>
+                        <label htmlFor="content">Merkinnän sisältö:</label>
+                        <textarea
+                            id="content"
+                            value={content}
+                            onChange={(e) => setContent(e.target.value)}
+                            rows={4}
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label>Valitse teemat:</label>
+                        <div className="checkbox-group">
+                            {themes.map((theme) => (
+                                <label key={theme.name}>
+                                    <input
+                                        type="checkbox"
+                                        value={theme.name}
+                                        checked={selectedThemes.includes(theme.name)}
+                                        onChange={() => handleThemeChange(theme.name)}
+                                    />
+                                    <span
+                                        className="theme-color-dot"
+                                        style={{ backgroundColor: theme.color }}
+                                    />
+                                    {theme.name}
+                                </label>
+                            ))}
+                        </div>
+                    </div>
+                    <div>
+                        <label>Lisää kuva:</label>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => setImage(e.target.files?.[0] || null)}
+                        />
+                    </div>
+                    <div>
+                        <label>Valitse fiilikset:</label>
+                        <div className="checkbox-group">
+                            {availableMoods.map((mood) => (
+                                <label key={mood.value}>
+                                    <input
+                                        type="checkbox"
+                                        value={mood.value}
+                                        checked={moods.includes(mood.value)}
+                                        onChange={() => handleMoodChange(mood.value)}
+                                    />
+                                    {mood.label} {mood.value}
+                                </label>
+                            ))}
+                        </div>
+                    </div>
+                    <button type="submit">Tallenna merkintä</button>
+                    <button type="button" onClick={onClose}>
+                        Peruuta
+                    </button>
+                </form>
+            </div>
         </div>
     );
 };
