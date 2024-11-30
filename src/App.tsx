@@ -52,7 +52,8 @@ const App = () => {
 
   return (
     <div>
-      <header>Hetkien Arkisto</header>
+      <header>Hetkien Arkisto
+      </header>
       <main>
         <button onClick={() => setIsAddingTheme(true)}>Lisää uusi teema</button>
         <CalendarView
@@ -60,7 +61,7 @@ const App = () => {
           entries={entries}
           onAddEntry={handleAddEntry}
         />
-        <MoodThemeGraph entries={entries} themes={themes} graphType="moods" />
+
         <MoodThemeGraph entries={entries} themes={themes} graphType="themes" />
       </main>
       {isAddingTheme && (

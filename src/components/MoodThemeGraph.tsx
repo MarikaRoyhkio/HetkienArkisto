@@ -75,13 +75,15 @@ const MoodThemeGraph: React.FC<MoodThemeGraphProps> = ({ entries, themes }) => {
     };
 
     return (
-        <div>
-            <h3>Fiilisten jakauma</h3>
+        <div className="graphs">
             <div className="pie-chart-container">
+                <h3>Fiilisten jakauma</h3>
+
                 <Pie data={moodData} />
             </div>
-            <h3>Teemojen jakauma</h3>
             <div className="pie-chart-container">
+                <h3>Teemojen jakauma</h3>
+
                 <Pie data={themeData} />
             </div>
         </div>

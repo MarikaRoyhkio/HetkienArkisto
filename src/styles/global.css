@@ -153,6 +153,11 @@ form input[type='file'] {
     background: #fff;
     transition: background-color 0.3s ease, box-shadow 0.3s ease;
     cursor: pointer;
+    background-size: cover;
+    /* Taustakuvan tyyli */
+    background-position: center;
+    color: inherit;
+    /* Kuva ei yliaja fonttia */
 }
 
 .calendar-day:hover {
@@ -231,29 +236,6 @@ form input[type='file'] {
     color: #2a2d34;
 }
 
-/* Graafit */
-.graphs {
-    margin-top: 2rem;
-}
-
-.graph-container {
-    background: #f9dcc4;
-    border-radius: 15px;
-    padding: 1rem;
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
-    margin: 10px 0;
-    width: 100%;
-    max-width: 400px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.graph-container h3 {
-    font-size: 1.2rem;
-    text-align: center;
-    margin-bottom: 1rem;
-    color: #2a2d34;
-}
 
 .entry-image {
     max-width: 100%;
@@ -262,7 +244,17 @@ form input[type='file'] {
     margin: 10px 0;
 }
 
+.graphs {
+    text-align: center;
+
+}
+
 .pie-chart-container {
-    max-width: 400px;
-    margin: 0 auto;
+    max-width: 100%;
+    display: inline-block;
+
+}
+
+.pie-chart-container h3 {
+    text-align: center;
 }

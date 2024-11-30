@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import AddEntryForm from './AddEntryForm';
-import MoodThemeGraph from './MoodThemeGraph';
 import '../styles/global.css';
 
 type Entry = {
@@ -90,12 +89,23 @@ const CalendarView: React.FC<CalendarViewProps> = ({ themes, entries, onAddEntry
                 {daysInMonth.map((day) => {
                     const dayString = day.toISOString().split('T')[0];
                     const dayEntries = entries.filter((entry) => entry.date === dayString);
+                    const backgroundImage = dayEntries[0]?.image;
 
                     return (
                         <div
                             key={dayString}
                             className="calendar-day"
                             onClick={() => handleDayClick(dayString)}
+                            style={
+                                backgroundImage
+                                    ? {
+                                        backgroundImage: `url(${backgroundImage})`,
+                                        backgroundSize: 'cover',
+                                        backgroundPosition: 'center',
+                                        color: '#fff',
+                                    }
+                                    : undefined
+                            }
                         >
                             <span>{day.getDate()}</span>
                             <div className="day-symbols">
@@ -134,7 +144,6 @@ const CalendarView: React.FC<CalendarViewProps> = ({ themes, entries, onAddEntry
                                         <p>
                                             {entry.themes.join(', ')} {entry.moods.map((mood) => moodIcons[mood]).join(' ')}
                                         </p>
-
                                         <p>{entry.content}</p>
                                         {entry.image && (
                                             <div
@@ -158,7 +167,9 @@ const CalendarView: React.FC<CalendarViewProps> = ({ themes, entries, onAddEntry
                         )}
                         <div className="modal-buttons">
                             <button
-                                onClick={() => { setIsAddEntryFormVisible(true) }}
+                                onClick={() => {
+                                    setIsAddEntryFormVisible(true);
+                                }}
                             >
                                 Lisää merkintä
                             </button>
@@ -175,7 +186,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ themes, entries, onAddEntry
                     entries={filteredEntries}
                     onSave={(entry) => {
                         onAddEntry(entry);
-                        setIsAddEntryFormVisible(false); // Sulje lomake tallentamisen jälkeen
+                        setIsAddEntryFormVisible(false);
                     }}
                     onClose={() => setIsAddEntryFormVisible(false)}
                 />
@@ -185,4 +196,5 @@ const CalendarView: React.FC<CalendarViewProps> = ({ themes, entries, onAddEntry
 };
 
 export default CalendarView;
+
 
