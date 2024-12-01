@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import AddEntryForm from './AddEntryForm';
-//import AddThemeForm from './AddThemeForm';
 
-// Tyypit
+
+// Tietueiden tyypitys
 type Entry = {
     date: string;
     content: string;
@@ -11,31 +11,35 @@ type Entry = {
     moods: string[];
 };
 
+// Teeman tyypitys
 type Theme = {
     name: string;
     color: string;
 };
 
+// Komponentin propsien tyypitys
 type ThemeViewProps = {
-    themes: Theme[];
-    entries: Entry[];
-    onAddEntry: (entry: Entry) => void;
+    themes: Theme[]; // Kaikki käytettävissä olevat teemat
+    entries: Entry[]; // Kaikki merkinnät
+    onAddEntry: (entry: Entry) => void; // Funktio uuden merkinnän lisäämiseksi
 };
 
 const ThemeView: React.FC<ThemeViewProps> = ({ themes, entries, onAddEntry }) => {
     const [selectedDay, setSelectedDay] = useState<string | null>(null);
 
+    // Suodatetaan merkinnät valitulle päivälle
     const filteredEntries = entries.filter((entry) => entry.date === selectedDay);
 
     return (
         <div>
+            {/* Näytetään merkintälomake, jos päivä on valittu */}
             {selectedDay && (
                 <AddEntryForm
-                    date={selectedDay} // Varmistetaan, että päivämäärä välitetään
-                    themes={themes} // Teemat, joita voidaan valita
-                    entries={filteredEntries}
-                    onSave={onAddEntry} // Tallenna merkintä
-                    onClose={() => setSelectedDay(null)} // Sulje lomake
+                    date={selectedDay} // Välitetään valittu päivämäärä lomakkeelle
+                    themes={themes} // Välitetään teemat lomakkeelle
+                    entries={filteredEntries} // Välitetään valitun päivän merkinnät
+                    onSave={onAddEntry} // Tallenna uusi merkintä
+                    onClose={() => setSelectedDay(null)} // Tyhjennä valinta ja sulje lomake
                 />
             )}
         </div>
@@ -43,4 +47,5 @@ const ThemeView: React.FC<ThemeViewProps> = ({ themes, entries, onAddEntry }) =>
 };
 
 export default ThemeView;
+
 
